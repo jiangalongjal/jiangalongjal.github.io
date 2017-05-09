@@ -1,0 +1,222 @@
+1. 流的概念
+2. 流的分类
+3. 字节流与字符流
+流的概念
+流(stream)的概念源于UNIX中管道(pipe)的概念。在UNIX中，管道是?条不间断的字节流，?来实现程序或进程间的通信，或
+读写外围设备、外部?件等。
+数据流是?串连续不断的数据的集合,就像?管?的?流,在?管的?端?点?点地供?,?在?管的另?端看到的是?股连续不
+断的?流.
+数据写?程序可以使?段?段地向数据流管道中写?数据,这些数据段会按先后顺序形成?个?的数据流.
+在程序中所有的数据都是以流的?法进?传输和保存的。
+Java 的IO是实现输?和输出的基础。
+Java把所有传统的流类型(类或抽象类)都放在java.io包中，?以实现输?输出功能。
+输?和输出是?个相对的概念，我们?般站在程序的?度来分析和处理问题的。
+?程序需要数据 --> 读进来 --> 输?
+?程序保存数据 --> 写出去 --> 输出
+流的分类
+从不同?度分类：
+?按流动?向的不同可以分为输?流和输出流；
+?按处理数据的单位不同分为字节流和字符流；
+?按功能的不同可分为节点流和处理流；
+? 节点流：直接操作?标设备，例如：磁盘或?块内存区域。
+? 处理流：通过操作节点流,从?间接完成输?或输出功能的流。处理流是的存在是建?在?个已经存在的输?流
+或输出流的基础之上的。
+所有流都继承于以下四种抽象流类型的某?种：
+字节流 字符流
+输?流 InputStream Reader
+输出流 OutputStream Writer
+操作流的步骤
+File类本身是与?件操作有关，但是如果要想操作内容则必须使?字节流或字符流完成，但是不管是使?何种的输?输出流，
+其基本的操作原理是?样的（以?件流为准） :
+①使?File类找到?个?件对象,得到IO操作的源或?标
+②通过字节流或字符流的?类创建对象,(得到IO操作的通道)
+③进?读或写的操作,(IO操作)
+④关闭输?/输出,(打完收?,注意节约资源,关掉)
+由于流的操作属于资源操作，所以在操作的最后?定要关闭以释放资源。
+字节流和字符流
+?者仅仅是操作单位不?样。
+InputStream和Reader是所有输?流的基类，他们都是抽象类，本身不能创建实例，但是他们是所有输?流的模板。
+?般来说处理字符或字符串时使?字符流，处理字节或?进制对象时应使?字节流；
+字节流
+字节流主要是操作byte(字节)的类型数据:
+?字节输出流： OutputStream
+?字节输?流： InputStream
+OutputStream
+void flush() throws IOException:清空缓冲区
+abstract void close() throws IOException:关闭输出流
+void write(int c) throws IOException:将?个字节写到输出流中。
+void write(byte[] b) throws IOException:将?个byte数组写出。
+void write(byte[] b,int off,int len) throws IOException:将字节数组从off位置开始，?度为len的字节写?到输出流中。
+以其?类FileOutputStream来实例化OutputStream对象
+?FileOutputStream(File/String file) throws FileNotFoundException创建?个向指定 File 对象表示的?件中写?数据的?
+件输出流。
+?FileOutputStream(File/String file, boolean append) throws FileNotFoundException创建?个向指定 File 对象表示的?
+件中写?数据的?件输出流
+计算机访问外部设备,要?直接访问内存慢得多,若我们每?次write?法调?都是直接写到外部设备(?如磁盘上的?个?件),CPU
+就要花费更多的时间去等待外部设备;我们可以开辟?个内存缓冲区,程序每?次的write?法都是写到这个内存缓冲区中,只有这
+个缓冲区装满了之后,系统才将这个缓冲区的内容?次集中写到外部设备.
+好处:1.有效提?了CPU的使?率;2.write?法并没有?上真正写?到外部设备,我们还有机会回滚部分写?的数据;
+public static void main(String[] args) throws Exception {
+OutputStream out = new FileOutputStream("test.txt");
+out.write("hello".getBytes());
+out.flush();
+out.close();
+}
+public static void main(String[] args) throws Exception {
+OutputStream out = new FileOutputStream("test.txt",true);
+byte[] bys = "hello".getBytes();
+for (int i = 0; i < bys.length; i++) {
+out.write(bys[i]);//每次只写??个内容
+}
+out.flush();
+out.close();
+}
+InputStream
+int available() throws IOException:?件??
+abstract void close() throws IOException:关闭流
+int read() throws IOException:从输?流中读取单个字节,返回该字节。
+int read(byte[] b) throws IOException:从输?流中读取b.length个字节存储在字节数组b中，返回实际读取的字节数。
+?直到read(byte[] b)?法返回-1表示输?流的结束。
+以其?类FileInputStream来实例化InputStream对象
+?FileInputStream(File/String file) throws FileNotFoundException 创建?个向指定 File 对象表示的?件中写?数据的?
+件输出流。
+public static void main(String[] args) {
+String path = "pathName";
+InputStream input = null;
+input = new FileInputStream(new File(path));
+// 定义缓冲区
+byte[] bys = new byte[50];
+int len = 0;
+while ((len = input.read(bys)) != -1) {
+System.out.println(new String(bys, 0, len));
+}
+input.close();
+}
+}
+字符流
+Java中的字符是Unicode编码,是双字节的,1个字符 等于 2个字节;
+使?字节来处理字符?本就不太?便了,此时可以考虑使?字符流;
+字符流主要是操作char的类型数据:
+?字符输出流： Writer
+?字符输?流： Reader
+Reader
+abstract void close() throws IOException:关闭流
+int read() throws IOException:从输?流中读取单个字符。
+int read(char[] cbuf) throws IOException:从输?流中读取最多c.length个字节的数据，并将其存储在字符数组c中，返回实际读
+取的字节。
+?直到read(char[] c)?法返回-1表示输?流的结束。
+?char[] cBuff = new char[1024];//动态声明数组，?度
+?read(cBuff ) !=-1 read(cBuff ) >0
+以其?类FileReader来实例化Reader对象
+?FileReader(File/String file) throws FileNotFoundException 创建?个向指定对象的?件输?流
+字符输?流
+public static void main(String[] args) {
+String path = "pathName";
+Reader reader = null;
+reader = new FileReader(new File(path));
+// 定义缓冲区
+char[] buf = new char[50];
+int len = 0;
+//循环读取直到为空的时候
+while ((len = input.read(bufbys)) != -1) {
+System.out.println(new String(buf, 0, len));
+}
+read.close();
+}
+}
+Writer
+abstract void flush() throws IOException:清空缓存
+abstract void close() throws IOException:关闭流
+void write(char[] cbuf):将字符数组中的数据输?到输出流中。
+void write(char[] cbuf,int off,int len):将字符数组从off位置开始，?度为len的字节输?到输出流中。
+void write(String str):将str字符串所有字符输出到指定的输出流中。
+void write(String str,int off, int len):将str字符串?从off位置开始，?度为len的字符输出到指定的输出流中。
+以其?类FileWriter来实例化Writer对象
+?FileWriter(File/String file, boolean append) throws FileNotFoundException 创建?个向指定对象的?件输出流，
+append表示是否追加。默认是false
+public static void main(String[] args) throws Exception {
+Writer writer = new FileWriter("test.txt");
+String str = "hello,cditcast";
+char[] cbuf = str.toCharArray();//把字符串转成char数组
+writer.write(cbuf);//写进?件
+writer.flush();//刷新缓冲区
+writer.close();//关闭流
+}
+字节→字符转换流
+OutputStreamWriter:把字节输出流对象转成字符输出流对象
+InputStreamReader:把字节输?流对象转成字符输?流对象
+FileWriter和FileReader分别是OutputStreamWriter和InputStreamReader的直接?类，?不是Writer和Reader的直接?类，区别
+于FileInputStream 和InputStream。
+注： ?论使?字节流还是字符流实际上在内存中最终都是通过字节的形式来操作流的。
+//构建?个字节输出流对象
+OutputStream out = new FileOutputStream("");
+//把字节输出流转成字符输出流
+Writer w = new OutputStreamWriter(out);
+//然后的操作和使?字符输出流的操作?样
+---------------------------------------------
+//构建?个字节输?流对象
+InputStream is = new FileInputStream("");
+//把字节输?流转成字符输?流
+Reader r = new InputStreamReader(is);
+//然后的操作和使?字符输?流的操作?样
+字节流和字符流的区别
+字节流和字符流在使?上的代码结构都是?常类似的，但是其内部本身也是有区别的，因为在进?字符流操作的时候会使?到
+缓冲区，?字节流操作的时候是不会使?到缓冲区的。
+在输出的时候， OutputStream类即使最后没有关闭内容也可以输出。但是如果是Writer的话，则如果不关闭，最后?条内容是
+?法输出的，因为所有的内容都是保存在了缓冲区之中，每当调?了close()?法就意味着清空缓冲区了。那么可以证明字
+符流确实使?了缓冲区：
+?字节流：程序 → ?件
+?字符流：程序 → 缓冲区 → ?件
+如果现在字符流即使不关闭也可以完成输出的话，则必须强制性清空缓冲区：
+?法： public void flush() throws IOException
+两者相?， 肯定使?字节流更加的?便，?且在程序中像图?、 MP3等都是采?字节的?式的保存，那么肯定字节流会?字符
+流使?的更?泛。
+但是需要说明的是，如果要是想操作中?的话，字符流肯定是最好使的。
+?动关闭资源的try语句
+Java 7简化资源清理(try-with-resources)?动关闭资源的try语句
+try (
+FileOutputStream fos = new FileOutputStream("test.txt");
+DataOutputStream dos = new DataOutputStream(fos)
+)
+{
+dos.writeUTF("Java 7 Block Buster");
+} catch (IOException e) {
+// log the exception
+}
+public static void beforejava7(String srcPath, String destPath) {
+InputStream is = null; OutputStream os = null;
+try {
+is = new FileInputStream(srcPath);
+os = new FileOutputStream(destPath);
+byte[] bys = new byte[1024];
+int len = 0;
+while ((len = is.read(bys)) != -1) {
+os.write(bys, 0, len);
+}
+} catch (Exception e) {//处理异常
+} finally {
+try {
+if (os != null) { os.close(); }
+} catch (Exception e) {//处理异常
+} finally {//表示?论os是否真正关闭,最后都要关闭is
+try {
+if (is != null) { is.close(); }
+} catch (Exception e) {//处理异常
+}}}
+System.out.println("搞定");
+}
+public static void afterjava7(String srcPath, String destPath) {
+try (
+InputStream is = new FileInputStream(srcPath);
+OutputStream os = new FileOutputStream(destPath);
+) {
+byte[] bys = new byte[1024];
+int len = 0;
+while ((len = is.read(bys)) != -1) {
+os.write(bys, 0, len);
+}
+} catch (Exception e) {
+e.printStackTrace();
+}
+System.out.println("搞定");
+}
