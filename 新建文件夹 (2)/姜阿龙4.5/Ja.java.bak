@@ -1,0 +1,15 @@
+class Ja
+{
+	public static void main(String[] arge){
+		Son son=new Son();
+	}
+}
+class Fa
+{
+	public Fa(){}
+}
+class Son extends Fa()
+{
+	System.out.println("imfa");
+
+}
